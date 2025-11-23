@@ -1,12 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:hussam_protfolio/core/constants/app_menu_list.dart';
 import 'package:hussam_protfolio/core/extensions/extensions.dart';
+
+import '../theme/app_size.dart';
+import 'app_bar_drawer_icon.dart';
+import 'language_switcher.dart';
+import 'large_app_menu_item_widget.dart';
 
 class MyAppBar extends StatelessWidget {
   const MyAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [AppLogo(), Spacer(), AppMenus(), Spacer(), LanguageSwitcher(), ThemeSwitcher()]);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      alignment: Alignment.center,
+      height: context.appInsets.appBarHeight,
+      constraints: BoxConstraints(maxWidth: Insets.maxWidth),
+      padding: EdgeInsets.symmetric(horizontal: context.appInsets.padding),
+      decoration: BoxDecoration(color: context.theme.appBarTheme.backgroundColor),
+      child: Row(
+        children: [
+          AppLogo(),
+          Spacer(),
+          if (context.isDesktop) AppMenus(),
+          Spacer(),
+          LanguageSwitcher(),
+          ThemeSwitcher(),
+          if (!context.isDesktop) AppBarDrawerIcon(),
+        ],
+      ),
+    );
   }
 }
 
@@ -24,19 +48,10 @@ class AppMenus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(spacing: 20, children: [Text('Home'), Text('About'), Text('Contact')]);
-  }
-}
-
-class LanguageSwitcher extends StatelessWidget {
-  const LanguageSwitcher({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton(
-      itemBuilder: (context) {
-        return [const PopupMenuItem(value: 'ar', child: Text('Arabic')), const PopupMenuItem(value: 'en', child: Text('English'))];
-      },
+    return Row(
+      children: AppMenuList.items(context).map((item) {
+        return LargeAppMenuItemWidget(item, onTap: () => Navigator.pushNamed(context, item.route));
+      }).toList(),
     );
   }
 }
